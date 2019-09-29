@@ -205,7 +205,9 @@ def model_fn(features, labels, mode, params):
 
         # prepare optimizer & training ops
         d_optimizer = tf.train.AdamOptimizer(g_learning_rate, beta1=0.0, beta2=0.99, epsilon=1e-8)
-        g_optimizer = tf.train.AdamOptimizer(d_learning_rate, beta1=0.0, beta2=0.99, epsilon=1e-8)
+        d_optimizer = tf.tpu.CrossShardOptimizer(d_optimizer)
+        g_optimizer = tf.train.AdamOptimizer(d_learning_rate, beta1=0.0, beta2=0.99, epsilon=1e-8)      
+        g_optimizer = tf.tpu.CrossShardOptimizer(g_optimizer)
         d_train_opt = d_optimizer.minimize(d_loss, var_list=d_vars)
         g_train_opt = g_optimizer.minimize(g_loss, var_list=g_vars, global_step=global_step)
         train_op = tf.group(d_train_opt, g_train_opt)
@@ -223,14 +225,14 @@ def model_fn(features, labels, mode, params):
         tf.summary.image('real_images', summary_real_images[:5], max_outputs=5)
         tf.summary.image('fake_images', summary_fake_images[:5], max_outputs=5)
         tf.summary.image('fake_images_eval', summary_fake_images_eval[:5], max_outputs=5)
-        return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op, eval_metric_ops={}, predictions={})
+        return tf.estimator.tpu.TPUEstimatorSpec(mode=mode, loss=loss, train_op=train_op, eval_metrics=(), predictions={})
 
     # ==================================================================================================================
     # EVALUATION
     # ==================================================================================================================
     if mode == tf.estimator.ModeKeys.EVAL:
         # tf.summary.image not working on eval mode?
-        return tf.estimator.EstimatorSpec(mode=mode, loss=zero_constant, eval_metric_ops={})
+        return tf.estimator.tpu.TPUEstimatorSpec(mode=mode, loss=zero_constant, eval_metrics=())
 
     # ==================================================================================================================
     # PREDICTION
@@ -246,4 +248,4 @@ def model_fn(features, labels, mode, params):
             'fake_images': fake_images_eval
         }
         if mode == tf.estimator.ModeKeys.PREDICT:
-            return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
+            return tf.estimator.tpu.TPUEstimatorSpec(mode=mode, predictions=predictions)
