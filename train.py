@@ -24,7 +24,7 @@ tf.logging.set_verbosity(tf.logging.INFO)
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--model_base_dir', default='./models', type=str)
 parser.add_argument('--tfrecord_dir', default='/mnt/vision-nas/data-sets/stylegan/ffhq-dataset/tfrecords/ffhq', type=str)
-parser.add_argument('--my_ram_size_in_gigabytes', default=16, type=int)
+parser.add_argument('--my_ram_size_in_gigabytes', default=12, type=int)
 parser.add_argument('--n_samples', default=70000, type=int)
 args = vars(parser.parse_args())
 
