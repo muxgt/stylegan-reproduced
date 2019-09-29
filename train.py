@@ -75,7 +75,7 @@ def train(model_dir, train_res, n_images, estimator_params, estimator_ws):
     tpu_worker = 'grpc://' + os.environ['COLAB_TPU_ADDR']
     tpu_cluster_resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu_worker)
     tpu_run_config = tf.estimator.tpu.RunConfig(cluster=tpu_cluster_resolver,
-                                        keep_checkpoint_max=1,
+                                        keep_checkpoint_max=5,
                                         save_checkpoints_steps=2000)
     model = tf.estimator.tpu.TPUEstimator(
         model_fn=model_fn,
