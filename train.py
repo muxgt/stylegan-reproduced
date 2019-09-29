@@ -74,7 +74,7 @@ def train(model_dir, train_res, n_images, estimator_params, estimator_ws):
     distribution = tf.contrib.distribute.MirroredStrategy()
     run_config = tf.estimator.RunConfig(keep_checkpoint_max=1,
                                         save_checkpoints_steps=2000,
-                                        train_distribute=distribution)
+                                        train_distribute=None)
     model = tf.estimator.Estimator(
         model_fn=model_fn,
         model_dir=model_dir,
