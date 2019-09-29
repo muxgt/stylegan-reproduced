@@ -23,10 +23,10 @@ def parse_tfrecord_tf(record):
 
 # repeat() with count=None will make dataset repeated indefinitely (managed by tf.estimator's max_step)
 # When using dataset.prefetch, use buffer_size=None to let it detect optimal buffer size
-def train_input_fn(tfrecord_base_dir, resolution, batch_size, shuffle_buffer_size, epochs=None):
+def train_input_fn(tfrecord_base_dir, resolution, shuffle_buffer_size, epochs=None, params):
     fn_index = int(np.log2(resolution))
     tfrecord_fn = os.path.join(tfrecord_base_dir, 'ffhq-r{:02d}.tfrecords'.format(fn_index))
-
+    batch_size = params["batch_size"]
     dataset = tf.data.TFRecordDataset(tfrecord_fn)
     dataset = dataset.map(parse_tfrecord_tf, num_parallel_calls=8)
     dataset = dataset.shuffle(buffer_size=shuffle_buffer_size, reshuffle_each_iteration=True)
@@ -42,7 +42,7 @@ def train_input_fn(tfrecord_base_dir, resolution, batch_size, shuffle_buffer_siz
 
 
 # dumy input function --> not used
-def eval_input_fn():
+def eval_input_fn(params):
     dataset = tf.data.Dataset.range(1)
     dataset = dataset.batch(1)
     dataset = dataset.map(
@@ -53,7 +53,7 @@ def eval_input_fn():
     return dataset
 
 
-def test_input_fn(tfrecord_dir):
+def test_input_fn(tfrecord_dir, params):
     n_samples = 70000
     is_training = True
     my_ram_size_in_gigabytes = 16
