@@ -71,14 +71,16 @@ def train(model_dir, train_res, n_images, estimator_params, estimator_ws):
     batch_size = estimator_params['batch_size']
 
     # create estimator with distribution training ready
-    distribution = tf.contrib.distribute.MirroredStrategy()
-    run_config = tf.estimator.RunConfig(keep_checkpoint_max=1,
-                                        save_checkpoints_steps=2000,
-                                        train_distribute=None)
-    model = tf.estimator.Estimator(
+    #distribution = tf.contrib.distribute.MirroredStrategy()
+    tpu_worker = 'grpc://' + os.environ['COLAB_TPU_ADDR']
+    tpu_cluster_resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu_worker)
+    tpu_run_config = tf.estimator.tpu.RunConfig(cluster=tpu_cluster_resolver,
+                                        keep_checkpoint_max=1,
+                                        save_checkpoints_steps=2000)
+    model = tf.estimator.tpu.TPUEstimator(
         model_fn=model_fn,
         model_dir=model_dir,
-        config=run_config,
+        config=tpu_run_config,
         params=estimator_params,
         warm_start_from=estimator_ws
     )
