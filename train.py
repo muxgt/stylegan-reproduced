@@ -59,7 +59,7 @@ def set_training_ws(res_to_restore, model_base_dir, add_global_step=False):
     return ws
 
 
-def train(model_dir, train_res, n_images, estimator_params, estimator_ws):
+def train(model_dir, train_res, n_images, batch_size, estimator_params, estimator_ws):
     # early exit condition
     if n_images <= 0:
         return
@@ -80,7 +80,11 @@ def train(model_dir, train_res, n_images, estimator_params, estimator_ws):
     model = tf.estimator.tpu.TPUEstimator(
         model_fn=model_fn,
         model_dir=model_dir,
+        use_tpu=True,
         config=tpu_run_config,
+        train_batch_size = batch_size
+        eval_batch_size = batch_size
+        predict_batch_size = batch_size
         params=estimator_params,
         warm_start_from=estimator_ws
     )
@@ -215,13 +219,13 @@ def main():
         tf.logging.log(tf.logging.INFO, '[moono]: transition training')
         ws = None if ii == 0 else set_training_ws(prv_res_to_restore, model_base_dir, add_global_step=False)
         n_images_to_show = train_n_images[res]['trans']
-        train(model_dir, res, n_images_to_show, estimator_params, estimator_ws=ws)
+        train(model_dir, res, n_images_to_show, batch_size, estimator_params, estimator_ws=ws)
 
         # fixed training (restore variable from current resolution with global_step)
         tf.logging.log(tf.logging.INFO, '[moono]: fixed training')
         ws = set_training_ws(cur_res_to_restore, model_base_dir, add_global_step=True)
         n_images_to_show = train_n_images[res]['trans'] + train_n_images[res]['fixed']
-        train(model_dir, res, n_images_to_show, estimator_params, estimator_ws=ws)
+        train(model_dir, res, n_images_to_show, batch_size, estimator_params, estimator_ws=ws)
     return
 
 
