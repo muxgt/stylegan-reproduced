@@ -206,7 +206,6 @@ def main():
             'featuremaps': train_featuremaps,
             'do_train_trans': do_train_trans,
             'train_trans_images_per_res': train_n_images[res]['trans'],
-            'batch_size': batch_size,
             'g_learning_rate': g_learning_rates.get(res, learning_rate_base),
             'd_learning_rate': d_learning_rates.get(res, learning_rate_base),
         }
