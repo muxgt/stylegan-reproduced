@@ -82,9 +82,9 @@ def train(model_dir, train_res, n_images, batch_size, estimator_params, estimato
         model_dir=model_dir,
         use_tpu=True,
         config=tpu_run_config,
-        train_batch_size = batch_size
-        eval_batch_size = batch_size
-        predict_batch_size = batch_size
+        train_batch_size = batch_size,
+        eval_batch_size = batch_size,
+        predict_batch_size = batch_size,
         params=estimator_params,
         warm_start_from=estimator_ws
     )
